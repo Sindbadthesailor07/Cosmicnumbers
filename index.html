@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Cosmic Numbers — Discover Your Destiny</title>
+    <meta name="description" content="Cosmic Numbers: free numerology calculator for Life Path, Destiny, Soul Urge & Personality. Private, beautiful, made with love.">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=Caveat:wght@700&display=swap');
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        :root {
+            --sky:     #87CEEB;
+            --cream:   #FFFDE7;
+            --white:   #FFFFFF;
+            --peach:   #FF8B6B;
+            --pink:    #FF6B9D;
+            --yellow:  #FFD93D;
+            --mint:    #6BCB77;
+            --blue:    #4FC3F7;
+            --purple:  #B39DDB;
+            --orange:  #FFA726;
+            --red:     #EF5350;
+            --outline: #1A1A1A;
+            /* ✅ SAFE TEXT COLORS — dark enough on all card backgrounds */
+            --txt-dark:   #1A1A1A;
+            --txt-medium: #2D2D2D;
+            --txt-sub:    #444444;   /* replaces #555/#666 which clashed on pale bgs */
+        }
+
+        body { font-family:'Nunito',sans-serif; background:var(--sky); min-height:100vh; overflow-x:hidden; }
+
+        /* ══════════════════════════════
+           FLAT 2D SCENE
+        ══════════════════════════════ */
+        .scene { position:fixed; inset:0; z-index:0; }
+        .sky-rect { position:absolute; inset:0; background:#87CEEB; }
+
+        .sun { position:absolute; top:28px; right:72px; width:78px; height:78px;
+               background:#FFD93D; border-radius:50%; border:4px solid var(--outline);
+               animation:sunSpin 22s linear infinite; z-index:1; }
+        .sun-ray { position:absolute; top:50%; left:50%; width:13px; height:4px;
+                   background:#FFD93D; border:2px solid var(--outline); border-radius:2px;
+                   transform-origin:left center; }
+        @keyframes sunSpin { to { transform:rotate(360deg); } }
+
+        .cloud { position:absolute; animation:cloudMove var(--spd) linear infinite; }
+        .cloud-main { position:relative; background:#FFF; width:var(--w); height:var(--h);
+                      border-radius:999px; border:4px solid var(--outline); }
+        .cloud-main::before { content:''; position:absolute; background:#FFF;
+                              border:4px solid var(--outline); border-radius:50%;
+                              width:calc(var(--w)*0.48); height:calc(var(--w)*0.48);
+                              top:calc(var(--w)*-0.26); left:14%; clip-path:inset(0 0 48% 0); }
+        .cloud-main::after  { content:''; position:absolute; background:#FFF;
+                              border:4px solid var(--outline); border-radius:50%;
+                              width:calc(var(--w)*0.34); height:calc(var(--w)*0.34);
+                              top:calc(var(--w)*-0.18); left:48%; clip-path:inset(0 0 48% 0); }
+        @keyframes cloudMove { 0%{transform:translateX(var(--from));} 100%{transform:translateX(var(--to));} }
+
+        .hills { position:absolute; bottom:0; width:100%; height:200px; }
+        .hill  { position:absolute; border-radius:50% 50% 0 0; bottom:0;
+                 border-top:4px solid var(--outline); border-left:4px solid var(--outline);
+                 border-right:4px solid var(--outline); }
+        .h1 { width:120%; height:160px; background:#8BC34A; left:-10%; }
+        .h2 { width:70%;  height:130px; background:#6BCB77; right:-5%; }
+        .h3 { width:55%;  height:110px; background:#4D9A57; left:0; }
+        .ground-strip { position:absolute; bottom:0; width:100%; height:44px;
+                        background:#4D9A57; border-top:4px solid var(--outline); }
+
+        .flower { position:absolute; bottom:28px; display:flex; flex-direction:column;
+                  align-items:center; animation:sway var(--s,2.5s) ease-in-out infinite;
+                  transform-origin:bottom center; }
+        @keyframes sway { 0%,100%{transform:rotate(-6deg);} 50%{transform:rotate(6deg);} }
+        .flower-stem { width:5px; height:var(--stem); background:#4D9A57;
+                       border-left:3px solid var(--outline); border-right:3px solid var(--outline); }
+        .flower-face { font-size:var(--fs); line-height:1; margin-bottom:-2px; }
+
+        .bird { position:absolute; font-size:1.2rem; animation:birdFly var(--bt) linear infinite; }
+        @keyframes birdFly { 0%{transform:translateX(-60px);opacity:0;} 5%{opacity:1;} 95%{opacity:1;} 100%{transform:translateX(110vw);opacity:0;} }
+
+        /* ══════════════════════════════
+           2D STICKER SYSTEM
+           Each sticker = colored circle + thick outline + offset shadow → flat badge feel
+        ══════════════════════════════ */
+        .sk {
+            display:inline-flex; align-items:center; justify-content:center;
+            font-size:var(--fs,1rem);
+            width:var(--sz,30px); height:var(--sz,30px);
+            background:var(--bg,#FFD93D);
+            border:3px solid var(--outline);
+            border-radius:50%;
+            position:absolute;
+            /* hard offset = flat 2D sticker shadow */
+            box-shadow:3px 3px 0 var(--outline);
+            animation:skWobble var(--spd,3s) ease-in-out infinite;
+            animation-delay:var(--dl,0s);
+            z-index:6; line-height:1; pointer-events:none;
+        }
+        @keyframes skWobble {
+            0%,100% { transform:rotate(-14deg) scale(1);   }
+            50%      { transform:rotate(14deg)  scale(1.12); }
+        }
+        /* Larger hero sticker variant */
+        .sk-lg { --sz:42px; --fs:1.3rem; border-width:3.5px; box-shadow:4px 4px 0 var(--outline); }
+        /* Small card-corner sticker */
+        .sk-sm { --sz:22px; --fs:0.75rem; border-width:2px; box-shadow:2px 2px 0 var(--outline); }
+
+        /* Sky stickers */
+        .sky-stickers .sk { position:absolute; }
+
+        /* ══════════════════════════════
+           LAYOUT
+        ══════════════════════════════ */
+        .wrap { max-width:980px; margin:0 auto; padding:24px 18px 280px; position:relative; z-index:10; }
+
+        /* ══════════════════════════════
+           HEADER
+        ══════════════════════════════ */
+        .header { background:var(--cream); border:4px solid var(--outline);
+                  border-radius:32px; padding:40px 52px 44px;
+                  text-align:center; margin-bottom:22px; position:relative; overflow:visible; }
+        .header-shadow { position:absolute; inset:0; background:var(--peach);
+                         border:4px solid var(--outline); border-radius:32px;
+                         z-index:-1; transform:translate(8px,8px); }
+        .header-badge { display:inline-block; background:var(--mint);
+                        border:3px solid var(--outline); border-radius:999px;
+                        font-family:'Caveat',cursive; font-size:1.1rem;
+                        color:var(--txt-dark);   /* ✅ dark on green */
+                        padding:4px 22px; margin-bottom:12px; }
+        .header h1 { font-family:'Fredoka One',cursive;
+                     font-size:clamp(2.6rem,7vw,5rem);
+                     color:var(--txt-dark);       /* ✅ dark on cream */
+                     line-height:1; letter-spacing:1px; }
+        .header h1 .accent { color:#B71C1C; }     /* deep red — high contrast on cream */
+        .header-sub { font-family:'Caveat',cursive; font-size:1.3rem;
+                      color:var(--txt-sub); margin-top:8px; }  /* ✅ #444 on cream */
+        .mascot { position:absolute; right:-20px; top:-24px;
+                  width:86px; height:86px; background:var(--yellow);
+                  border:4px solid var(--outline); border-radius:50%;
+                  display:flex; align-items:center; justify-content:center;
+                  font-size:2.3rem; animation:mascotBounce 2s ease-in-out infinite; z-index:20; }
+        @keyframes mascotBounce { 0%,100%{transform:translateY(0) rotate(-8deg);} 50%{transform:translateY(-10px) rotate(8deg);} }
+        .leaf { position:absolute; font-size:1.8rem; }
+        .leaf.tl { top:-14px; left:12px; animation:leafBob 3s ease-in-out infinite; }
+        .leaf.tr { top:-14px; right:60px; animation:leafBob 3s ease-in-out infinite .5s; }
+        @keyframes leafBob { 0%,100%{transform:rotate(-20deg);} 50%{transform:rotate(-10deg) scale(1.1);} }
+
+        /* ══════════════════════════════
+           TABS
+        ══════════════════════════════ */
+        .tabs { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:22px; }
+        .tab { font-family:'Fredoka One',cursive; font-size:1rem;
+               padding:11px 26px; background:#FFF;
+               border:3px solid var(--outline); border-radius:999px;
+               cursor:pointer; color:var(--txt-dark);  /* ✅ */
+               transition:transform .1s,background .1s; position:relative; }
+        .tab::after { content:''; position:absolute; inset:-3px;
+                      border:3px solid var(--outline); border-radius:999px;
+                      background:var(--outline); z-index:-1; transform:translate(4px,4px); }
+        .tab:hover { transform:translate(-2px,-2px); }
+        .tab.active { background:var(--mint); transform:translate(2px,2px); }
+        .tab.active::after { transform:translate(2px,2px); }
+
+        /* ══════════════════════════════
+           PANELS
+        ══════════════════════════════ */
+        .panel { display:none; animation:popIn .3s ease; }
+        .panel.active { display:block; }
+        @keyframes popIn { from{transform:scale(.95);opacity:0;} to{transform:scale(1);opacity:1;} }
+
+        /* Flat card */
+        .flat-card { background:#FFF; border:4px solid var(--outline);
+                     border-radius:24px; padding:32px;
+                     margin-bottom:18px; position:relative; }
+        .fc-shadow { position:absolute; inset:0; border:4px solid var(--outline);
+                     border-radius:24px; z-index:-1; transform:translate(7px,7px); }
+        .section-title { font-family:'Fredoka One',cursive; font-size:1.4rem;
+                         color:var(--txt-dark); margin-bottom:22px;
+                         display:flex; align-items:center; gap:8px; }
+
+        /* ══════════════════════════════
+           INPUTS
+        ══════════════════════════════ */
+        .lbl { font-family:'Fredoka One',cursive; font-size:1rem;
+               color:var(--txt-dark); display:block; margin-bottom:7px; }
+        .flat-input { width:100%; padding:14px 20px;
+                      font-family:'Nunito',sans-serif; font-size:1.05rem; font-weight:800;
+                      background:var(--cream); border:3px solid var(--outline);
+                      border-radius:14px; color:var(--txt-dark);  /* ✅ dark on cream */
+                      outline:none; margin-bottom:18px; transition:background .1s; }
+        .flat-input:focus { background:#FFF9C4; }
+        .flat-input::placeholder { color:#7A6650; font-weight:700; }  /* ✅ visible placeholder */
+        input[type="date"]::-webkit-calendar-picker-indicator { cursor:pointer; }
+        .hint { font-family:'Caveat',cursive; font-size:1rem; color:var(--txt-sub);
+                margin-top:-12px; margin-bottom:16px; padding-left:4px; }
+
+        /* ══════════════════════════════
+           BUTTONS
+        ══════════════════════════════ */
+        .big-btn { font-family:'Fredoka One',cursive; font-size:1.3rem;
+                   padding:16px 32px; background:var(--peach);
+                   border:4px solid var(--outline); border-radius:999px;
+                   color:var(--txt-dark); cursor:pointer; width:100%;
+                   margin:4px 0 0; position:relative; transition:transform .1s; }
+        .big-btn::after { content:''; position:absolute; inset:-4px;
+                          border:4px solid var(--outline); border-radius:999px;
+                          background:var(--outline); z-index:-1; transform:translate(6px,6px); }
+        .big-btn:hover  { transform:translate(-3px,-3px); }
+        .big-btn:active { transform:translate(4px,4px); }
+
+        .sm-btn { font-family:'Fredoka One',cursive; font-size:.88rem;
+                  padding:9px 20px; border:3px solid var(--outline);
+                  border-radius:999px; cursor:pointer; position:relative;
+                  transition:transform .1s; color:var(--txt-dark); }  /* ✅ always dark */
+        .sm-btn::after { content:''; position:absolute; inset:-3px;
+                         border:3px solid var(--outline); border-radius:999px;
+                         background:var(--outline); z-index:-1; transform:translate(4px,4px); }
+        .sm-btn:hover  { transform:translate(-2px,-2px); }
+        .sm-btn:active { transform:translate(3px,3px); }
+        .sm-btn.g  { background:var(--mint);   }
+        .sm-btn.y  { background:var(--yellow); }
+        .sm-btn.b  { background:var(--blue);   }
+        .sm-btn.p  { background:var(--peach);  }
+        .sm-btn.pk { background:var(--pink);   }
+        .sm-btn.pu { background:var(--purple); }
+        .sm-btn.o  { background:var(--orange); }
+        .sm-btn.r  { background:#FFCDD2; }
+
+        /* ══════════════════════════════
+           SHARE SECTION
+        ══════════════════════════════ */
+        .share-section { background:#F1F8E9; border:3px solid var(--outline);
+                         border-radius:18px; padding:18px 20px; margin:16px 0; position:relative; }
+        .share-title { font-family:'Fredoka One',cursive; font-size:.95rem;
+                       color:var(--txt-dark); margin-bottom:12px; }  /* ✅ dark on green */
+        .share-row { display:flex; gap:10px; flex-wrap:wrap; }
+
+        /* ══════════════════════════════
+           RESULT CARDS
+        ══════════════════════════════ */
+        .results-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr));
+                        gap:16px; margin:22px 0; }
+        .num-card { border:4px solid var(--outline); border-radius:20px;
+                    padding:22px 14px 18px; text-align:center; cursor:pointer;
+                    position:relative; transition:transform .1s;
+                    animation:cardFloat var(--cf,3s) ease-in-out infinite; }
+        .num-card::after { content:''; position:absolute; inset:-4px;
+                           border:4px solid var(--outline); border-radius:20px;
+                           z-index:-1; transform:translate(6px,6px); }
+        .num-card:nth-child(1) { background:#FFF3E0; } .num-card:nth-child(1)::after { background:var(--peach); }
+        .num-card:nth-child(2) { background:#E3F2FD; } .num-card:nth-child(2)::after { background:var(--blue);  }
+        .num-card:nth-child(3) { background:#FFFDE7; } .num-card:nth-child(3)::after { background:var(--yellow);}
+        .num-card:nth-child(4) { background:#F1F8E9; } .num-card:nth-child(4)::after { background:var(--mint);  }
+        .num-card:hover  { transform:translate(-4px,-4px); }
+        .num-card:active { transform:translate(2px,2px); }
+        @keyframes cardFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+        .card-icon  { font-size:2rem; display:block; margin-bottom:6px; }
+        .card-label { font-family:'Fredoka One',cursive; font-size:.72rem;
+                      letter-spacing:1.5px; color:var(--txt-sub);  /* ✅ #444 not #555 */
+                      text-transform:uppercase; margin-bottom:4px; }
+        .card-num   { font-family:'Fredoka One',cursive; font-size:4rem; line-height:1;
+                      min-height:65px; display:flex; align-items:center; justify-content:center; }
+        /* ✅ deep saturated colors — all pass contrast on their card bg */
+        .num-card:nth-child(1) .card-num { color:#BF360C; }
+        .num-card:nth-child(2) .card-num { color:#0D47A1; }
+        .num-card:nth-child(3) .card-num { color:#E65100; }
+        .num-card:nth-child(4) .card-num { color:#1B5E20; }
+        .card-name { font-family:'Fredoka One',cursive; font-size:.9rem; color:var(--txt-dark); margin:6px 0 4px; }
+        .card-desc { font-size:.75rem; color:var(--txt-sub); font-weight:700;
+                     padding-top:6px; border-top:2px dashed #BBB; }  /* ✅ */
+
+        /* ══════════════════════════════
+           MEANING BOX
+        ══════════════════════════════ */
+        .meaning-box { background:var(--cream); border:3px solid var(--outline);
+                       border-radius:20px; padding:24px; margin:16px 0; position:relative; }
+        .mbox-shadow { position:absolute; inset:0; border:3px solid var(--outline);
+                       border-radius:20px; z-index:-1; transform:translate(6px,6px); }
+        .mtabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+        .mtab { font-family:'Fredoka One',cursive; font-size:.85rem; padding:8px 16px;
+                background:#FFF; border:2.5px solid var(--outline); border-radius:999px;
+                cursor:pointer; color:var(--txt-dark);  /* ✅ */
+                transition:background .1s,transform .1s; }
+        .mtab:hover,.mtab.on { background:var(--mint); transform:translate(-1px,-1px); }
+        .meaning-content { font-size:.97rem; line-height:1.75; color:var(--txt-dark); font-weight:700; min-height:80px; }
+        .dgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+        .dchip { background:#FFF; border:2.5px solid var(--outline); border-radius:12px; padding:10px 12px; }
+        .dchip-lbl { font-family:'Fredoka One',cursive; font-size:.68rem;
+                     letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+        .dchip-val { font-size:.82rem; color:var(--txt-dark); font-weight:700; line-height:1.4; } /* ✅ */
+
+        /* ══════════════════════════════
+           DAILY WIDGET
+        ══════════════════════════════ */
+        .daily-widget { background:#EDE7F6; border:3px solid var(--outline);
+                        border-radius:18px; padding:20px 24px; margin-bottom:18px;
+                        position:relative; display:flex; align-items:center; gap:20px; }
+        .daily-widget-shadow { position:absolute; inset:0; background:var(--purple);
+                               border:3px solid var(--outline); border-radius:18px;
+                               z-index:-1; transform:translate(6px,6px); }
+        .daily-num  { font-family:'Fredoka One',cursive; font-size:3.6rem;
+                      color:#4527A0; min-width:60px; text-align:center; }  /* ✅ deep purple on lavender */
+        .daily-title { font-family:'Fredoka One',cursive; font-size:1rem; color:var(--txt-dark); margin-bottom:4px; }
+        .daily-desc  { font-size:.88rem; color:var(--txt-medium); font-weight:700; line-height:1.5; }
+
+        /* ══════════════════════════════
+           COSMIC PROFILE (numeroscope)
+        ══════════════════════════════ */
+        .numeroscope { background:#E8F5E9; border:3px solid var(--outline);
+                       border-radius:18px; padding:22px; margin-bottom:16px; position:relative; }
+        .numeroscope-shadow { position:absolute; inset:0; background:var(--orange);
+                              border:3px solid var(--outline); border-radius:18px;
+                              z-index:-1; transform:translate(6px,6px); }
+        .nscope-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-top:14px; }
+        .nscope-chip { background:#FFF; border:2.5px solid var(--outline); border-radius:12px; padding:12px 10px; text-align:center; }
+        .nc-label { font-family:'Fredoka One',cursive; font-size:.68rem;
+                    color:var(--txt-sub); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }  /* ✅ */
+        .nc-icon  { font-size:1.4rem; display:block; margin-bottom:2px; }
+        .nc-val   { font-family:'Fredoka One',cursive; font-size:1rem; color:var(--txt-dark); }  /* ✅ */
+
+        /* ══════════════════════════════
+           PERSONAL YEAR WIDGET
+        ══════════════════════════════ */
+        .py-widget { background:#E8EAF6; border:3px solid var(--outline);
+                     border-radius:18px; padding:20px 24px; margin-bottom:16px;
+                     position:relative; display:flex; align-items:center; gap:20px; }
+        .py-shadow { position:absolute; inset:0; background:#7986CB;
+                     border:3px solid var(--outline); border-radius:18px;
+                     z-index:-1; transform:translate(6px,6px); }
+        .py-num  { font-family:'Fredoka One',cursive; font-size:3.2rem;
+                   color:#283593; min-width:55px; text-align:center; }  /* ✅ deep indigo on light blue */
+        .py-lbl  { font-family:'Fredoka One',cursive; font-size:.9rem; color:var(--txt-dark); margin-bottom:4px; }
+        .py-desc { font-size:.88rem; color:var(--txt-medium); font-weight:700; line-height:1.5; }
+
+        /* ══════════════════════════════
+           AFFIRMATION CARD
+        ══════════════════════════════ */
+        .affirm-card { background:#FFFDE7; border:3px solid var(--outline);
+                       border-radius:18px; padding:18px 22px; margin-bottom:16px;
+                       position:relative; text-align:center; }
+        .affirm-shadow { position:absolute; inset:0; background:var(--yellow);
+                         border:3px solid var(--outline); border-radius:18px;
+                         z-index:-1; transform:translate(6px,6px); }
+        .affirm-lbl  { font-family:'Fredoka One',cursive; font-size:.72rem;
+                       color:var(--txt-sub); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+        .affirm-text { font-family:'Caveat',cursive; font-size:1.35rem;
+                       color:var(--txt-dark); line-height:1.55; font-weight:700; }
+
+        /* ══════════════════════════════
+           PARTNER TAB
+        ══════════════════════════════ */
+        .partner-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+        .partner-box  { background:#FCE4EC; border:3px solid var(--outline); border-radius:18px; padding:18px; }
+        .compat-box   { background:#F1F8E9; border:3px solid var(--outline); border-radius:18px;
+                        padding:26px; text-align:center; margin-top:16px; position:relative; }
+        .compat-box-shadow { position:absolute; inset:0; background:var(--mint);
+                             border:3px solid var(--outline); border-radius:18px;
+                             z-index:-1; transform:translate(6px,6px); }
+        .compat-score { font-family:'Fredoka One',cursive; font-size:4.5rem; color:#1B5E20; }  /* ✅ */
+        .bar-track { width:100%; height:20px; background:#E0E0E0; border:3px solid var(--outline);
+                     border-radius:999px; margin:12px 0; overflow:hidden; }
+        .bar-fill  { height:100%;
+                     background:repeating-linear-gradient(90deg,var(--mint) 0,var(--mint) 14px,var(--peach) 14px,var(--peach) 28px);
+                     width:0%; transition:width 1.4s ease; border-radius:999px; }
+        .compat-msg  { font-family:'Fredoka One',cursive; font-size:1.1rem; color:var(--txt-dark); }  /* ✅ */
+        .compat-cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+        .compat-col-lbl { font-family:'Fredoka One',cursive; font-size:.9rem; color:var(--txt-dark); margin-bottom:8px; }
+        .cnum-row    { display:flex; justify-content:space-between; padding:6px 0;
+                       border-bottom:2px dashed #CCC; font-weight:800; font-size:.9rem; color:var(--txt-sub); }
+        .cnum-row strong { font-family:'Fredoka One',cursive; color:var(--txt-dark); font-size:1rem; }
+
+        /* ══════════════════════════════
+           LIBRARY
+        ══════════════════════════════ */
+        .num-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0; }
+        .ntile { background:#FFF; border:3px solid var(--outline);
+                 border-radius:14px; padding:14px 8px; text-align:center;
+                 cursor:pointer; transition:transform .1s,background .1s;
+                 font-family:'Fredoka One',cursive; position:relative; }
+        .ntile::after { content:''; position:absolute; inset:-3px; border:3px solid var(--outline);
+                        border-radius:14px; background:var(--outline); z-index:-1; transform:translate(4px,4px); }
+        .ntile:hover,.ntile.on { background:var(--yellow); transform:translate(-2px,-2px); }
+        .ntile .n  { font-size:1.9rem; color:var(--txt-dark); }
+        .ntile .nl { font-size:.6rem; color:var(--txt-sub);   /* ✅ */
+                     font-family:'Nunito',sans-serif; font-weight:800; letter-spacing:.5px; margin-top:2px; }
+
+        /* ══════════════════════════════
+           GUIDE BLOCKS
+        ══════════════════════════════ */
+        .guide-block { background:#FFF; border:3px solid var(--outline);
+                       border-radius:18px; padding:20px; margin-bottom:14px; position:relative; }
+        .guide-block::after { content:''; position:absolute; inset:0; border:3px solid var(--outline);
+                              border-radius:18px; z-index:-1; transform:translate(6px,6px); }
+        .guide-block:nth-child(1)::after { background:var(--blue);   }
+        .guide-block:nth-child(2)::after { background:var(--peach);  }
+        .guide-block:nth-child(3)::after { background:var(--yellow); }
+        .guide-block:nth-child(4)::after { background:var(--purple); }
+        .guide-block:nth-child(5)::after { background:var(--mint);   }
+        .guide-block:nth-child(6)::after { background:var(--orange); }
+        .guide-block:nth-child(7)::after { background:var(--pink);   }
+        .gtitle { font-family:'Fredoka One',cursive; font-size:1.1rem; color:var(--txt-dark); margin-bottom:8px; }
+        .gtext  { font-size:.94rem; color:var(--txt-medium); line-height:1.7; font-weight:700; }  /* ✅ #2D2D2D */
+        .formula { display:inline-block; background:var(--mint); border:2.5px solid var(--outline);
+                   border-radius:999px; font-family:'Caveat',cursive; font-size:1rem;
+                   padding:4px 16px; margin-top:10px; color:var(--txt-dark); }
+        .ref-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+        .ref-cell { background:var(--cream); border:2.5px solid var(--outline);
+                    border-radius:10px; padding:10px 6px; text-align:center;
+                    font-family:'Fredoka One',cursive; font-size:1rem; color:var(--txt-dark); }
+        .ref-cell span { display:block; font-size:.6rem; font-family:'Nunito',sans-serif;
+                         font-weight:800; color:var(--txt-sub); margin-top:2px; }  /* ✅ */
+
+        /* ══════════════════════════════
+           MASTER NUMBERS BANNER
+        ══════════════════════════════ */
+        .master-banner { background:#F3E5F5; border:3px solid var(--outline);
+                         border-radius:18px; padding:18px 20px; margin-bottom:14px; position:relative; }
+        .master-banner::after { content:''; position:absolute; inset:0; background:var(--purple);
+                                border:3px solid var(--outline); border-radius:18px;
+                                z-index:-1; transform:translate(6px,6px); }
+        .master-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+        .master-chip { background:#FFF; border:2.5px solid var(--outline); border-radius:12px;
+                       padding:12px 8px; text-align:center; }
+        .master-n    { font-family:'Fredoka One',cursive; font-size:1.6rem; color:#4A148C; }  /* ✅ deep purple on white */
+        .master-name { font-family:'Fredoka One',cursive; font-size:.72rem; color:var(--txt-sub); margin:2px 0; }
+        .master-desc { font-size:.72rem; color:var(--txt-medium); font-weight:700; line-height:1.3; }
+
+        /* ══════════════════════════════
+           LOADING
+        ══════════════════════════════ */
+        .loading { display:none; text-align:center; padding:44px 20px; background:#FFF;
+                   border:4px solid var(--outline); border-radius:24px; margin:16px 0; position:relative; }
+        .loading::after { content:''; position:absolute; inset:0; background:var(--yellow);
+                          border:4px solid var(--outline); border-radius:24px;
+                          z-index:-1; transform:translate(8px,8px); }
+        .loading.on { display:block; }
+        .spin-emoji  { font-size:2.6rem; display:inline-block; animation:spinEmoji .8s linear infinite; }
+        @keyframes spinEmoji { to{transform:rotate(360deg);} }
+        .load-bar-wrap { width:72%; max-width:300px; height:16px; background:#E0E0E0;
+                         border:3px solid var(--outline); border-radius:999px;
+                         margin:14px auto 0; overflow:hidden; }
+        .load-bar { height:100%;
+                    background:repeating-linear-gradient(90deg,var(--mint) 0,var(--mint) 12px,var(--peach) 12px,var(--peach) 24px);
+                    width:0%; border-radius:999px; animation:loadFill 1.6s ease forwards; }
+        @keyframes loadFill { to{width:100%;} }
+        .load-txt { font-family:'Caveat',cursive; font-size:1.2rem; color:var(--txt-medium); margin-top:10px; }
+
+        /* ══════════════════════════════
+           TOAST
+        ══════════════════════════════ */
+        .toast { position:fixed; bottom:50px; left:50%;
+                 transform:translateX(-50%) translateY(120px);
+                 background:var(--mint); border:3px solid var(--outline); border-radius:999px;
+                 font-family:'Fredoka One',cursive; font-size:1rem;
+                 color:var(--txt-dark); padding:12px 28px; z-index:9999;
+                 transition:transform .3s cubic-bezier(.34,1.56,.64,1); pointer-events:none; }
+        .toast.on { transform:translateX(-50%) translateY(0); }
+
+        /* ══════════════════════════════
+           SHARE MODAL
+        ══════════════════════════════ */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5);
+                         z-index:999; display:none; align-items:center; justify-content:center;
+                         padding:16px; }
+        .modal-overlay.on { display:flex; }
+        .modal { background:var(--cream); border:4px solid var(--outline);
+                 border-radius:28px; padding:28px 28px 22px;
+                 max-width:440px; width:100%; position:relative;
+                 max-height:90vh; overflow-y:auto; }
+        .modal-shadow { position:absolute; inset:0; background:var(--peach);
+                        border:4px solid var(--outline); border-radius:28px;
+                        z-index:-1; transform:translate(8px,8px); }
+        .modal-title  { font-family:'Fredoka One',cursive; font-size:1.45rem;
+                        color:var(--txt-dark); margin-bottom:16px; text-align:center; }
+        .modal-close  { position:absolute; top:12px; right:14px;
+                        font-family:'Fredoka One',cursive; font-size:1.4rem;
+                        background:var(--red); border:3px solid var(--outline); border-radius:50%;
+                        width:36px; height:36px; cursor:pointer; color:#FFF;
+                        display:flex; align-items:center; justify-content:center; }
+
+        /* Share card preview */
+        .share-card-preview { background:var(--cream); border:3px solid var(--outline);
+                              border-radius:18px; padding:20px; margin-bottom:16px; text-align:center; }
+        .sc-title   { font-family:'Fredoka One',cursive; font-size:1.35rem;
+                      color:var(--txt-dark); margin-bottom:3px; }
+        .sc-sub     { font-family:'Caveat',cursive; font-size:1rem;
+                      color:var(--txt-sub); margin-bottom:14px; }  /* ✅ #444 not #555 */
+        .sc-nums    { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .sc-num-chip { background:#FFF; border:2.5px solid var(--outline); border-radius:10px; padding:10px 8px; }
+        .scn-label  { font-family:'Fredoka One',cursive; font-size:.62rem;
+                      color:var(--txt-sub); letter-spacing:1px; text-transform:uppercase; }  /* ✅ */
+        .scn-val    { font-family:'Fredoka One',cursive; font-size:1.8rem;
+                      color:var(--txt-dark); line-height:1.1; }
+        .scn-name   { font-size:.7rem; color:var(--txt-sub); font-weight:800; }  /* ✅ */
+        .sc-footer  { margin-top:10px; font-family:'Caveat',cursive; font-size:.9rem; color:var(--txt-sub); }
+
+        .share-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .share-grid .sm-btn { text-align:center; padding:12px 8px; width:100%; font-size:.82rem; }
+
+        /* ══════════════════════════════
+           DIVIDER
+        ══════════════════════════════ */
+        .divider { display:flex; align-items:center; gap:10px; margin:18px 0 12px; }
+        .divider::before,.divider::after { content:''; flex:1; height:3px;
+                                           background:var(--outline); border-radius:2px; }
+        .divider span { font-family:'Fredoka One',cursive; font-size:.9rem;
+                        color:var(--txt-dark); white-space:nowrap; }
+
+        /* ══════════════════════════════
+           FOOTER
+        ══════════════════════════════ */
+        .footer { text-align:center; padding:24px; z-index:10; position:relative; margin-top:-200px; }
+        .footer p { font-family:'Caveat',cursive; font-size:1.1rem;
+                    color:#FFF; -webkit-text-stroke:.8px var(--outline); }
+
+        /* ══════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════ */
+        @media (max-width:640px) {
+            .flat-card,.header { padding:20px 16px; }
+            .partner-grid,.compat-cols,.dgrid,.master-row { grid-template-columns:1fr; }
+            .header h1 { font-size:2.4rem; }
+            .mascot { width:64px; height:64px; font-size:1.7rem; right:-12px; }
+            .share-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════ 2D FLAT SCENE ═══════════════ -->
+<div class="scene">
+    <div class="sky-rect"></div>
+
+    <!-- Sun -->
+    <div class="sun">
+        <div class="sun-ray" style="transform:rotate(0deg)   translateX(46px);"></div>
+        <div class="sun-ray" style="transform:rotate(45deg)  translateX(46px);"></div>
+        <div class="sun-ray" style="transform:rotate(90deg)  translateX(46px);"></div>
+        <div class="sun-ray" style="transform:rotate(135deg) translateX(46px);"></div>
+        <div class="sun-ray" style="transform:rotate(180deg) translateX(46px);"></div>
+        <div class="sun-ray" style="transform:rotate(225deg) translateX(46px);"></div>
+        <div class="sun-ray" style="transform:rotate(270deg) translateX(46px);"></div>
+        <div class="sun-ray" style="transform:rotate(315deg) translateX(46px);"></div>
+    </div>
+
+    <!-- Clouds -->
+    <div class="cloud" style="top:50px;  --spd:28s; --from:-180px; --to:110vw;"><div class="cloud-main" style="--w:160px;--h:46px;"></div></div>
+    <div class="cloud" style="top:100px; --spd:40s; --from:110vw;  --to:-200px; animation-direction:reverse;"><div class="cloud-main" style="--w:110px;--h:34px;"></div></div>
+    <div class="cloud" style="top:22px;  --spd:36s; --from:-120px; --to:110vw;  animation-delay:-14s;"><div class="cloud-main" style="--w:88px;--h:26px;"></div></div>
+    <div class="cloud" style="top:155px; --spd:50s; --from:110vw;  --to:-200px; animation-direction:reverse; animation-delay:-6s;"><div class="cloud-main" style="--w:140px;--h:40px;"></div></div>
+
+    <!-- Hills + ground -->
+    <div class="hills">
+        <div class="hill h1"></div>
+        <div class="hill h2"></div>
+        <div class="hill h3"></div>
+    </div>
+    <div class="ground-strip"></div>
+
+    <!-- Flowers -->
+    <div class="flower" style="left:4%;  --stem:32px;--fs:1.4rem;--s:2.4s;"><div class="flower-face">🌸</div><div class="flower-stem"></div></div>
+    <div class="flower" style="left:11%; --stem:44px;--fs:1.8rem;--s:2.8s;animation-delay:.3s;"><div class="flower-face">🌼</div><div class="flower-stem"></div></div>
+    <div class="flower" style="left:20%; --stem:28px;--fs:1.2rem;--s:2.2s;animation-delay:.7s;"><div class="flower-face">🌺</div><div class="flower-stem"></div></div>
+    <div class="flower" style="left:33%; --stem:38px;--fs:1.5rem;--s:2.6s;animation-delay:.2s;"><div class="flower-face">🌸</div><div class="flower-stem"></div></div>
+    <div class="flower" style="left:50%; --stem:34px;--fs:1.3rem;--s:2.3s;animation-delay:1s;"><div class="flower-face">🌼</div><div class="flower-stem"></div></div>
+    <div class="flower" style="left:63%; --stem:46px;--fs:1.7rem;--s:2.9s;animation-delay:.5s;"><div class="flower-face">🌻</div><div class="flower-stem"></div></div>
+    <div class="flower" style="left:76%; --stem:30px;--fs:1.2rem;--s:2.1s;animation-delay:1.1s;"><div class="flower-face">🌺</div><div class="flower-stem"></div></div>
+    <div class="flower" style="left:86%; --stem:40px;--fs:1.4rem;--s:2.5s;animation-delay:.4s;"><div class="flower-face">🌸</div><div class="flower-stem"></div></div>
+    <div class="flower" style="left:94%; --stem:36px;--fs:1.3rem;--s:2.7s;animation-delay:.8s;"><div class="flower-face">🌼</div><div class="flower-stem"></div></div>
+
+    <!-- Birds -->
+    <div class="bird" style="top:14%;--bt:18s;animation-delay:0s;">🐦</div>
+    <div class="bird" style="top:20%;--bt:24s;animation-delay:-8s;font-size:.9rem;">🐦</div>
+
+    <!-- ✦ SKY STICKERS — 2D badge style scattered across sky ✦ -->
+    <div class="sky-stickers">
+        <div class="sk sk-lg" style="--bg:#FFD93D;top:9%;left:4%;--spd:3.2s;">⭐</div>
+        <div class="sk sk-lg" style="--bg:#FFB3C6;top:6%;left:22%;--spd:4s;--dl:1s;">💫</div>
+        <div class="sk sk-lg" style="--bg:#B2EBF2;top:13%;left:44%;--spd:3.6s;--dl:.5s;">✨</div>
+        <div class="sk sk-lg" style="--bg:#C8E6C9;top:5%;left:65%;--spd:2.9s;--dl:1.4s;">🌙</div>
+        <div class="sk sk-lg" style="--bg:#F8BBD0;top:18%;left:84%;--spd:3.4s;--dl:.8s;">🌈</div>
+        <div class="sk"       style="--bg:#DCEDC8;--sz:28px;--fs:.9rem;top:28%;left:2%;--spd:3.8s;--dl:.3s;">🍀</div>
+        <div class="sk"       style="--bg:#FFE0B2;--sz:28px;--fs:.9rem;top:32%;left:93%;--spd:4.2s;--dl:1.2s;">🦋</div>
+        <div class="sk"       style="--bg:#E1BEE7;--sz:26px;--fs:.85rem;top:4%;left:38%;--spd:3s;--dl:2s;">🌟</div>
+        <div class="sk"       style="--bg:#FFF9C4;--sz:26px;--fs:.85rem;top:22%;left:57%;--spd:3.5s;--dl:.6s;">🪐</div>
+        <div class="sk"       style="--bg:#FFCCBC;--sz:28px;--fs:.9rem;top:16%;left:14%;--spd:2.6s;--dl:1.8s;">🌸</div>
+        <div class="sk"       style="--bg:#B3E5FC;--sz:26px;--fs:.85rem;top:8%;left:76%;--spd:3.9s;--dl:.9s;">☁️</div>
+        <div class="sk"       style="--bg:#F0F4C3;--sz:24px;--fs:.8rem; top:24%;left:31%;--spd:4.4s;--dl:1.6s;">🌿</div>
+    </div>
+</div>
+
+<!-- ═══════════════ SHARE MODAL ═══════════════ -->
+<div class="modal-overlay" id="shareModal">
+    <div class="modal" style="position:relative;">
+        <div class="modal-shadow"></div>
+        <button class="modal-close" onclick="closeShareModal()">✕</button>
+        <div class="modal-title">🌟 Share Your Cosmic Numbers!</div>
+
+        <!-- live preview card -->
+        <div class="share-card-preview" id="shareCardPreview">
+            <div style="font-size:1.4rem;margin-bottom:4px;">🌟</div>
+            <div class="sc-title">Cosmic Numbers</div>
+            <div class="sc-sub" id="scSubName">My Cosmic Reading</div>
+            <div class="sc-nums">
+                <div class="sc-num-chip">
+                    <div class="scn-label">🌟 Life Path</div>
+                    <div class="scn-val" id="sc1">–</div>
+                    <div class="scn-name" id="sc1n">–</div>
+                </div>
+                <div class="sc-num-chip">
+                    <div class="scn-label">🎯 Destiny</div>
+                    <div class="scn-val" id="sc2">–</div>
+                    <div class="scn-name" id="sc2n">–</div>
+                </div>
+                <div class="sc-num-chip">
+                    <div class="scn-label">💭 Soul Urge</div>
+                    <div class="scn-val" id="sc3">–</div>
+                    <div class="scn-name" id="sc3n">–</div>
+                </div>
+                <div class="sc-num-chip">
+                    <div class="scn-label">🎭 Personality</div>
+                    <div class="scn-val" id="sc4">–</div>
+                    <div class="scn-name" id="sc4n">–</div>
+                </div>
+            </div>
+            <div class="sc-footer">✨ cosmicnumbers.app ✨</div>
+        </div>
+
+        <!-- 6-platform share grid -->
+        <div class="share-grid">
+            <button class="sm-btn g"  onclick="shareVia('whatsapp')">📱 WhatsApp</button>
+            <button class="sm-btn b"  onclick="shareVia('twitter')">🐦 Twitter / X</button>
+            <button class="sm-btn r"  onclick="shareVia('facebook')">👥 Facebook</button>
+            <button class="sm-btn pu" onclick="shareVia('instagram')">📸 Instagram</button>
+            <button class="sm-btn y"  onclick="shareVia('copy')">📋 Copy Text</button>
+            <button class="sm-btn p"  onclick="shareVia('image')">🖼️ Save Image</button>
+        </div>
+        <button class="sm-btn" style="width:100%;text-align:center;padding:11px;background:#E8F5E9;margin-top:10px;font-size:.82rem;" onclick="shareVia('native')">↗️ More sharing options…</button>
+    </div>
+</div>
+
+<div class="toast" id="toast">✨ Done!</div>
+
+<!-- ═══════════════ MAIN WRAP ═══════════════ -->
+<div class="wrap">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-shadow"></div>
+        <div class="leaf tl">🍃</div>
+        <div class="leaf tr">🍃</div>
+        <div class="mascot">🔮</div>
+
+        <!-- header stickers -->
+        <div class="sk sk-sm" style="--bg:#FFD93D;bottom:-12px;left:28px;--spd:2.5s;">⭐</div>
+        <div class="sk sk-sm" style="--bg:#FFB3C6;bottom:-8px;right:96px;--spd:3s;--dl:.6s;">💫</div>
+        <div class="sk sk-sm" style="--bg:#B2EBF2;top:8px;left:90px;--spd:3.5s;--dl:.3s;">✨</div>
+        <div class="sk sk-sm" style="--bg:#DCEDC8;top:8px;right:160px;--spd:2.8s;--dl:1s;">🌿</div>
+
+        <div class="header-badge">✨ Your Personal Cosmic Guide</div>
+        <h1>Cosmic <span class="accent">Numbers</span></h1>
+        <p class="header-sub">Ancient wisdom · Natural energy · Your destiny decoded 🌿</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active"  onclick="goTab('self',this)"   >🌟 My Numbers</button>
+        <button class="tab"         onclick="goTab('partner',this)" >💕 Love Match</button>
+        <button class="tab"         onclick="goTab('library',this)" >📖 Library</button>
+        <button class="tab"         onclick="goTab('guide',this)"   >🌿 Guide</button>
+        <button class="tab"         onclick="goTab('about',this)"   >🌸 About</button>
+    </div>
+
+    <!-- ══════════════════════════════
+         TAB: MY NUMBERS
+    ══════════════════════════════ -->
+    <div id="self-panel" class="panel active">
+
+        <!-- Daily Universal Number -->
+        <div class="daily-widget" style="position:relative;">
+            <div class="daily-widget-shadow"></div>
+            <div class="sk sk-sm" style="--bg:#FFD93D;top:-10px;right:18px;--spd:2.8s;">⭐</div>
+            <div class="daily-num" id="dailyNum">?</div>
+            <div>
+                <div class="daily-title">🌅 Today's Universal Number</div>
+                <div class="daily-desc" id="dailyDesc">Loading today's cosmic energy…</div>
+            </div>
+        </div>
+
+        <!-- Input card -->
+        <div class="flat-card" style="position:relative;">
+            <div class="fc-shadow" style="background:var(--blue);"></div>
+            <div class="sk sk-sm" style="--bg:#C8E6C9;top:-12px;left:50%;--spd:3.2s;">🌿</div>
+            <div class="section-title">🌱 Enter Your Details</div>
+
+            <label class="lbl">📝 Full Birth Name</label>
+            <input type="text" class="flat-input" id="selfName" placeholder="e.g. Shreya">
+            <div class="hint">🍃 Use the exact name on your birth certificate</div>
+
+            <label class="lbl">🎂 Birth Date</label>
+            <input type="date" class="flat-input" id="selfBirthDate">
+            <div class="hint">🌸 Your origin timestamp in the cosmos</div>
+
+            <button class="big-btn" onclick="calcSelf()">🔮 Reveal My Cosmic Numbers!</button>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spin-emoji">✿</div>
+            <div class="load-txt">Reading the stars for you…</div>
+            <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
+        </div>
+
+        <!-- Results -->
+        <div id="resultCard" style="display:none;">
+            <div class="divider"><span>🌸 Your Cosmic Numbers 🌸</span></div>
+
+            <!-- 4 number cards -->
+            <div class="results-grid">
+                <div class="num-card" style="--cf:3.8s;" onclick="showM('lifePath',document.getElementById('n1').textContent)">
+                    <div class="sk sk-sm" style="--bg:#FFD93D;top:-9px;right:-7px;--spd:3s;">⭐</div>
+                    <span class="card-icon">🌟</span>
+                    <div class="card-label">Life Path</div>
+                    <div class="card-num" id="n1">–</div>
+                    <div class="card-name" id="n1name">–</div>
+                    <div class="card-desc" id="n1desc">Your life journey</div>
+                </div>
+                <div class="num-card" style="--cf:4.2s;" onclick="showM('destiny',document.getElementById('n2').textContent)">
+                    <div class="sk sk-sm" style="--bg:#FFB3C6;top:-9px;right:-7px;--spd:2.6s;--dl:.4s;">💫</div>
+                    <span class="card-icon">🎯</span>
+                    <div class="card-label">Destiny</div>
+                    <div class="card-num" id="n2">–</div>
+                    <div class="card-name" id="n2name">–</div>
+                    <div class="card-desc" id="n2desc">Your mission</div>
+                </div>
+                <div class="num-card" style="--cf:3.5s;" onclick="showM('soulUrge',document.getElementById('n3').textContent)">
+                    <div class="sk sk-sm" style="--bg:#B2EBF2;top:-9px;right:-7px;--spd:3.5s;--dl:.7s;">✨</div>
+                    <span class="card-icon">💭</span>
+                    <div class="card-label">Soul Urge</div>
+                    <div class="card-num" id="n3">–</div>
+                    <div class="card-name" id="n3name">–</div>
+                    <div class="card-desc" id="n3desc">Heart's desire</div>
+                </div>
+                <div class="num-card" style="--cf:4.5s;" onclick="showM('personality',document.getElementById('n4').textContent)">
+                    <div class="sk sk-sm" style="--bg:#DCEDC8;top:-9px;right:-7px;--spd:3.2s;--dl:1s;">🍀</div>
+                    <span class="card-icon">🎭</span>
+                    <div class="card-label">Personality</div>
+                    <div class="card-num" id="n4">–</div>
+                    <div class="card-name" id="n4name">–</div>
+                    <div class="card-desc" id="n4desc">How others see you</div>
+                </div>
+            </div>
+
+            <!-- Cosmic Profile -->
+            <div class="numeroscope" style="position:relative;">
+                <div class="numeroscope-shadow"></div>
+                <div class="sk sk-sm" style="--bg:#FFD93D;top:-10px;left:20px;--spd:3s;">✨</div>
+                <div class="section-title" style="margin-bottom:6px;">🔭 Your Cosmic Profile</div>
+                <div style="font-size:.86rem;color:var(--txt-sub);font-weight:700;margin-bottom:4px;">Extra insights from your Life Path number</div>
+                <div class="nscope-grid">
+                    <div class="nscope-chip"><div class="nc-label">Element</div><div class="nc-icon" id="nsEl">–</div><div class="nc-val" id="nsElTxt">–</div></div>
+                    <div class="nscope-chip"><div class="nc-label">Planet</div><div class="nc-icon" id="nsPl">–</div><div class="nc-val" id="nsPlTxt">–</div></div>
+                    <div class="nscope-chip"><div class="nc-label">Lucky Color</div><div class="nc-icon" id="nsCol">🎨</div><div class="nc-val" id="nsColTxt">–</div></div>
+                    <div class="nscope-chip"><div class="nc-label">Lucky Day</div><div class="nc-icon" id="nsDay">📅</div><div class="nc-val" id="nsDayTxt">–</div></div>
+                    <div class="nscope-chip"><div class="nc-label">Gem Stone</div><div class="nc-icon" id="nsGem">💎</div><div class="nc-val" id="nsGemTxt">–</div></div>
+                    <div class="nscope-chip"><div class="nc-label">Best Match</div><div class="nc-icon" id="nsMat">❤️</div><div class="nc-val" id="nsMatTxt">–</div></div>
+                </div>
+            </div>
+
+            <!-- Personal Year -->
+            <div class="py-widget" id="pyWidget" style="display:none;">
+                <div class="py-shadow"></div>
+                <div class="sk sk-sm" style="--bg:#C5CAE9;top:-9px;right:16px;--spd:3s;--dl:.5s;">📅</div>
+                <div class="py-num" id="pyNum">?</div>
+                <div>
+                    <div class="py-lbl">📅 Personal Year <span id="pyYearLabel"></span></div>
+                    <div class="py-desc" id="pyDesc">Loading…</div>
+                </div>
+            </div>
+
+            <!-- Affirmation -->
+            <div class="affirm-card" id="affirmCard" style="display:none;position:relative;">
+                <div class="affirm-shadow"></div>
+                <div class="sk sk-sm" style="--bg:#FFF9C4;top:-9px;left:20px;--spd:2.8s;">💛</div>
+                <div class="affirm-lbl">✨ Your Cosmic Affirmation</div>
+                <div class="affirm-text" id="affirmText">–</div>
+            </div>
+
+            <!-- Meaning explorer -->
+            <div class="meaning-box" style="position:relative;">
+                <div class="mbox-shadow" style="background:var(--purple);"></div>
+                <div class="sk sk-sm" style="--bg:#EDE7F6;top:-9px;right:28px;--spd:3.4s;--dl:.3s;">🔮</div>
+                <div class="mtabs">
+                    <button class="mtab on" onclick="qMeaning('lifePath',this)">🌟 Life Path</button>
+                    <button class="mtab"    onclick="qMeaning('destiny',this)">🎯 Destiny</button>
+                    <button class="mtab"    onclick="qMeaning('soulUrge',this)">💭 Soul Urge</button>
+                    <button class="mtab"    onclick="qMeaning('personality',this)">🎭 Personality</button>
+                </div>
+                <div class="meaning-content" id="qMean">Tap a number card or a tab above to reveal its cosmic meaning ✨</div>
+            </div>
+
+            <!-- Share section -->
+            <div class="share-section" style="position:relative;">
+                <div class="sk sk-sm" style="--bg:#FFB3C6;top:-10px;right:18px;--spd:3.2s;--dl:.5s;">💌</div>
+                <div class="share-title">💌 Share Your Cosmic Numbers</div>
+                <div class="share-row">
+                    <button class="sm-btn g"  onclick="openShareModal()">🌟 Share / Download</button>
+                    <button class="sm-btn y"  onclick="shareVia('copy')">📋 Copy Text</button>
+                    <button class="sm-btn b"  onclick="shareVia('whatsapp')">📱 WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         TAB: LOVE MATCH
+    ══════════════════════════════ -->
+    <div id="partner-panel" class="panel">
+        <div class="flat-card" style="position:relative;">
+            <div class="fc-shadow" style="background:var(--pink);"></div>
+            <div class="sk sk-sm" style="--bg:#F8BBD0;top:-12px;left:50%;--spd:2.8s;">💕</div>
+            <div class="section-title">💕 Love Compatibility</div>
+            <div class="partner-grid">
+                <div class="partner-box">
+                    <label class="lbl">👤 Your Name</label>
+                    <input type="text" class="flat-input" id="pyName" placeholder="Your name">
+                    <label class="lbl">🎂 Your Birth Date</label>
+                    <input type="date" class="flat-input" id="pyBirth">
+                </div>
+                <div class="partner-box">
+                    <label class="lbl">💖 Partner's Name</label>
+                    <input type="text" class="flat-input" id="ptName" placeholder="Their name">
+                    <label class="lbl">🎂 Their Birth Date</label>
+                    <input type="date" class="flat-input" id="ptBirth">
+                </div>
+            </div>
+            <button class="big-btn" style="background:var(--pink);" onclick="calcCompat()">💘 Check Our Cosmic Love Match!</button>
+        </div>
+
+        <div id="compatResult" style="display:none;">
+            <div class="divider"><span>💕 Match Results 💕</span></div>
+            <div class="flat-card" style="position:relative;">
+                <div class="fc-shadow" style="background:var(--pink);"></div>
+                <div class="compat-cols">
+                    <div>
+                        <div class="compat-col-lbl">🙋 Your Numbers</div>
+                        <div class="cnum-row">Life Path <strong id="yLP">–</strong></div>
+                        <div class="cnum-row">Destiny <strong id="yD">–</strong></div>
+                        <div class="cnum-row">Soul Urge <strong id="yS">–</strong></div>
+                        <div class="cnum-row">Personality <strong id="yP">–</strong></div>
+                    </div>
+                    <div>
+                        <div class="compat-col-lbl">💖 Partner Numbers</div>
+                        <div class="cnum-row">Life Path <strong id="tLP">–</strong></div>
+                        <div class="cnum-row">Destiny <strong id="tD">–</strong></div>
+                        <div class="cnum-row">Soul Urge <strong id="tS">–</strong></div>
+                        <div class="cnum-row">Personality <strong id="tP">–</strong></div>
+                    </div>
+                </div>
+                <div class="compat-box" style="position:relative;">
+                    <div class="compat-box-shadow"></div>
+                    <div style="font-family:'Caveat',cursive;font-size:1.1rem;color:var(--txt-medium);margin-bottom:4px;">💞 Cosmic Match Score</div>
+                    <div class="compat-score" id="cScore">0%</div>
+                    <div class="bar-track"><div class="bar-fill" id="cBar"></div></div>
+                    <div class="compat-msg" id="cMsg">Reading the stars…</div>
+                </div>
+                <div class="share-section" style="margin-top:16px;position:relative;">
+                    <div class="share-title">💌 Share Your Love Match</div>
+                    <div class="share-row">
+                        <button class="sm-btn p"  onclick="shareCompat('whatsapp')">📱 WhatsApp</button>
+                        <button class="sm-btn b"  onclick="shareCompat('twitter')">🐦 Twitter</button>
+                        <button class="sm-btn r"  onclick="shareCompat('facebook')">👥 Facebook</button>
+                        <button class="sm-btn y"  onclick="shareCompat('copy')">📋 Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         TAB: LIBRARY
+    ══════════════════════════════ -->
+    <div id="library-panel" class="panel">
+        <div class="flat-card" style="position:relative;">
+            <div class="fc-shadow" style="background:var(--yellow);"></div>
+            <div class="sk sk-sm" style="--bg:#FFD93D;top:-12px;left:50%;--spd:3s;">📖</div>
+            <div class="section-title">📖 Cosmic Number Library</div>
+            <div class="mtabs">
+                <button class="mtab on" onclick="setLibT('lifePath',this)">🌟 Life Path</button>
+                <button class="mtab"    onclick="setLibT('destiny',this)">🎯 Destiny</button>
+                <button class="mtab"    onclick="setLibT('soulUrge',this)">💭 Soul Urge</button>
+                <button class="mtab"    onclick="setLibT('personality',this)">🎭 Personality</button>
+            </div>
+            <div class="num-grid">
+                <div class="ntile" onclick="showLib(1,this)"><div class="n">1</div><div class="nl">Leader</div></div>
+                <div class="ntile" onclick="showLib(2,this)"><div class="n">2</div><div class="nl">Peacemaker</div></div>
+                <div class="ntile" onclick="showLib(3,this)"><div class="n">3</div><div class="nl">Creator</div></div>
+                <div class="ntile" onclick="showLib(4,this)"><div class="n">4</div><div class="nl">Builder</div></div>
+                <div class="ntile" onclick="showLib(5,this)"><div class="n">5</div><div class="nl">Adventurer</div></div>
+                <div class="ntile" onclick="showLib(6,this)"><div class="n">6</div><div class="nl">Caretaker</div></div>
+                <div class="ntile" onclick="showLib(7,this)"><div class="n">7</div><div class="nl">Seeker</div></div>
+                <div class="ntile" onclick="showLib(8,this)"><div class="n">8</div><div class="nl">Achiever</div></div>
+                <div class="ntile" onclick="showLib(9,this)"><div class="n">9</div><div class="nl">Humanitarian</div></div>
+            </div>
+            <div class="meaning-box" style="position:relative;">
+                <div class="mbox-shadow" style="background:var(--orange);"></div>
+                <div class="meaning-content" id="libMean">🌸 Pick a number above to explore its cosmic meaning!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         TAB: GUIDE
+    ══════════════════════════════ -->
+    <div id="guide-panel" class="panel">
+        <div class="flat-card" style="position:relative;">
+            <div class="fc-shadow" style="background:var(--mint);"></div>
+            <div class="sk sk-sm" style="--bg:#DCEDC8;top:-12px;left:50%;--spd:3s;">🌿</div>
+            <div class="section-title">🌿 Numerology Guide</div>
+
+            <div class="guide-block">
+                <div class="gtitle">🌍 What is Numerology?</div>
+                <div class="gtext">Numerology is the ancient study of how numbers shape our lives, personalities, and destinies. Rooted in Pythagorean philosophy, it reveals that your birth date and name carry a unique cosmic code — each digit vibrating with special energy and meaning that guides your path.</div>
+            </div>
+            <div class="guide-block">
+                <div class="gtitle">🌟 Life Path Number</div>
+                <div class="gtext">The most important number in your chart. It reveals your life's purpose, the path you're meant to walk, and the core lessons you're here to learn. Think of it as your soul's GPS for this lifetime — always pointing toward your truest direction.</div>
+                <div class="formula">📅 Month + Day + Year → reduce to 1–9</div>
+            </div>
+            <div class="guide-block">
+                <div class="gtitle">🎯 Destiny (Expression) Number</div>
+                <div class="gtext">Reveals your natural talents, abilities, and what you are truly destined to achieve in this life. Every letter of your full birth name is assigned a Pythagorean value and summed together, then reduced.</div>
+                <div class="formula">📝 A=1, B=2, C=3 … all letters → reduce</div>
+            </div>
+            <div class="guide-block">
+                <div class="gtitle">💭 Soul Urge Number</div>
+                <div class="gtext">The voice of your innermost self — your heart's most secret desires and what truly brings deep joy to your soul. Only the vowels in your full birth name are used, making this the most intimate of all your numbers.</div>
+                <div class="formula">💖 Vowels only (A E I O U) → reduce</div>
+            </div>
+            <div class="guide-block">
+                <div class="gtitle">🎭 Personality Number</div>
+                <div class="gtext">How the world perceives you before they truly know you. Your outer persona and the very first impression you create. This number is built only from the consonants in your birth name.</div>
+                <div class="formula">👥 Consonants only → reduce</div>
+            </div>
+            <div class="guide-block">
+                <div class="gtitle">🔢 How to Reduce Numbers</div>
+                <div class="gtext">Keep adding all digits together until you reach a single digit (1–9). For example: Birthday 29/11/1995 → 2+9+1+1+1+9+9+5 = 37 → 3+7 = 10 → 1+0 = 1. Important exception: Master Numbers 11, 22, and 33 are never reduced further — they carry extra power.</div>
+            </div>
+
+            <!-- Master Numbers -->
+            <div class="master-banner">
+                <div class="gtitle" style="color:var(--txt-dark);">⚡ Master Numbers — Extra Power</div>
+                <div class="gtext" style="margin-bottom:8px;">These three special numbers carry amplified cosmic energy. If you calculate one of these at any stage of reduction, stop — do not reduce further.</div>
+                <div class="master-row">
+                    <div class="master-chip">
+                        <div class="master-n">11</div>
+                        <div class="master-name">The Illuminator</div>
+                        <div class="master-desc">Highly intuitive, spiritual visionary, a channel for higher wisdom</div>
+                    </div>
+                    <div class="master-chip">
+                        <div class="master-n">22</div>
+                        <div class="master-name">The Master Builder</div>
+                        <div class="master-desc">Turns the greatest dreams into enduring reality on a grand scale</div>
+                    </div>
+                    <div class="master-chip">
+                        <div class="master-n">33</div>
+                        <div class="master-name">The Master Teacher</div>
+                        <div class="master-desc">Rare selfless healer dedicated to uplifting all of humanity</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="guide-block">
+                <div class="gtitle">⚡ Quick Reference Chart</div>
+                <div class="ref-grid">
+                    <div class="ref-cell">1<span>Leader</span></div>
+                    <div class="ref-cell">2<span>Peacemaker</span></div>
+                    <div class="ref-cell">3<span>Creator</span></div>
+                    <div class="ref-cell">4<span>Builder</span></div>
+                    <div class="ref-cell">5<span>Adventurer</span></div>
+                    <div class="ref-cell">6<span>Caretaker</span></div>
+                    <div class="ref-cell">7<span>Seeker</span></div>
+                    <div class="ref-cell">8<span>Achiever</span></div>
+                    <div class="ref-cell">9<span>Humanitarian</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         TAB: ABOUT
+    ══════════════════════════════ -->
+    <div id="about-panel" class="panel">
+        <div class="flat-card" style="position:relative;">
+            <div class="fc-shadow" style="background:var(--purple);"></div>
+            <div class="sk sk-sm" style="--bg:#EDE7F6;top:-12px;left:50%;--spd:3s;">🌸</div>
+            <div class="section-title">🌸 About Cosmic Numbers</div>
+
+            <div class="guide-block" style="background:#EDE7F6;">
+                <div class="gtitle">🌟 What is Cosmic Numbers?</div>
+                <div class="gtext">Cosmic Numbers is your personal numerology companion — a free, beautiful tool that decodes the hidden language of your birth date and name. We blend ancient Pythagorean numerology with a joyful, natural experience so every soul can discover their cosmic story.</div>
+            </div>
+            <div class="guide-block" style="background:#E3F2FD;">
+                <div class="gtitle">🔢 Our Formula</div>
+                <div class="gtext">We use the classical Pythagorean system — the most widely practised numerology method worldwide. Each letter maps to a number 1–9, all calculations reduce to a single digit, and Master Numbers 11, 22 and 33 are preserved in their full power.</div>
+            </div>
+            <div class="guide-block" style="background:#F1F8E9;">
+                <div class="gtitle">🔒 Your Privacy</div>
+                <div class="gtext">Everything is calculated entirely inside your browser. We never store, transmit or share your name or birth date. Your cosmic data belongs only to you — zero tracking, zero servers, pure local magic.</div>
+            </div>
+            <div class="guide-block" style="background:#FFF3E0;">
+                <div class="gtitle">✨ Coming Soon</div>
+                <div class="gtext">🗓️ Personal Year Forecasts &nbsp;·&nbsp; 📄 Full Numerology Chart PDF &nbsp;·&nbsp; 👶 Baby Name Numerology &nbsp;·&nbsp; 💼 Business Name Checker &nbsp;·&nbsp; 📊 Monthly & Weekly Number Readings</div>
+            </div>
+            <div class="guide-block" style="background:#FCE4EC;">
+                <div class="gtitle">💌 Spread the Cosmic Love</div>
+                <div class="gtext">Enjoyed your reading? Share Cosmic Numbers with friends and family — every soul deserves to know their numbers! ✨</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+                    <button class="sm-btn g"  onclick="shareAbout('whatsapp')">📱 WhatsApp</button>
+                    <button class="sm-btn b"  onclick="shareAbout('twitter')">🐦 Twitter</button>
+                    <button class="sm-btn r"  onclick="shareAbout('facebook')">👥 Facebook</button>
+                    <button class="sm-btn y"  onclick="shareAbout('copy')">📋 Copy Link</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /wrap -->
+
+<div class="footer">
+    <p>🌸 Cosmic Numbers — Every soul has a story written in numbers 🌸</p>
+    <p style="font-size:.88rem;margin-top:4px;">✨ Free forever · Private · Made with love</p>
+</div>
+
+<script>
+/* ══════════════════════════════════
+   DATABASE
+══════════════════════════════════ */
+const DB = {
+  lp:{
+    1:{name:"The Leader",   icon:"🦁",desc:"A natural-born leader — independent, brave, and here to forge entirely new paths. Your courage and originality inspire everyone around you.",pos:"Courageous, ambitious, original, confident",neg:"Can be bossy, impatient, or stubborn",career:"CEO, Entrepreneur, Inventor, Director",love:"Needs a partner who respects independence",advice:"Embrace collaboration — teamwork multiplies your power.",el:"Fire",pl:"Sun",color:"Red & Gold",gem:"Ruby",day:"Sunday",match:"1, 5, 7"},
+    2:{name:"The Peacemaker",icon:"🕊️",desc:"You bring harmony wherever you go — kind, gentle, and deeply cooperative. Your greatest gift is making others feel truly heard and valued.",pos:"Diplomatic, sensitive, peaceful, intuitive",neg:"Can be too sensitive or indecisive",career:"Counselor, Diplomat, Teacher, Mediator",love:"Needs harmony and a true partner",advice:"Trust your feelings and stand firm in your truth.",el:"Water",pl:"Moon",color:"White & Silver",gem:"Pearl",day:"Monday",match:"2, 4, 8"},
+    3:{name:"The Creator",  icon:"🎨",desc:"Bursting with creativity and joy! Artistic, expressive, and magnetic — you light up every room you enter and inspire others with your vibrant energy.",pos:"Creative, optimistic, charismatic, social",neg:"Can be scattered, dramatic, or unfocused",career:"Artist, Writer, Performer, Designer",love:"Attracted to creative souls, needs admiration",advice:"Focus your beautiful energy — finish what you start!",el:"Air",pl:"Jupiter",color:"Yellow & Orange",gem:"Topaz",day:"Thursday",match:"3, 6, 9"},
+    4:{name:"The Builder",  icon:"🌳",desc:"The solid, dependable rock. Practical, hardworking, and utterly reliable — you build things that stand the test of time and provide security for all.",pos:"Hardworking, loyal, organized, trustworthy",neg:"Can be inflexible, stubborn, or a workaholic",career:"Engineer, Architect, Manager, Builder",love:"Stable and faithful — security matters most",advice:"Let yourself be flexible; change brings growth.",el:"Earth",pl:"Uranus",color:"Green & Brown",gem:"Emerald",day:"Saturday",match:"2, 4, 8"},
+    5:{name:"The Adventurer",icon:"🦋",desc:"Freedom is your heartbeat! Versatile, curious, and magnetically exciting — life is never boring when you're around. Change energises you like nothing else.",pos:"Adaptable, adventurous, magnetic, progressive",neg:"Restless, impulsive, or commitment-phobic",career:"Travel Writer, Entrepreneur, Explorer",love:"Needs freedom and spontaneity in love",advice:"Channel your wild energy into meaningful adventures.",el:"Air",pl:"Mercury",color:"Turquoise & Silver",gem:"Aquamarine",day:"Wednesday",match:"1, 5, 7"},
+    6:{name:"The Caretaker",icon:"🏡",desc:"You have the biggest heart of all — responsible, warm, and endlessly nurturing. People always turn to you because your compassion and reliability never waver.",pos:"Nurturing, responsible, compassionate, artistic",neg:"Can be meddlesome, anxious, or self-sacrificing",career:"Teacher, Healer, Counselor, Homemaker",love:"Devoted partner who needs to feel truly needed",advice:"Remember to pour love and care into yourself too.",el:"Earth",pl:"Venus",color:"Pink & Blue",gem:"Turquoise",day:"Friday",match:"3, 6, 9"},
+    7:{name:"The Seeker",   icon:"🦉",desc:"Wise and wonderfully deep — forever searching for truth, meaning, and the hidden knowledge beneath the surface of everything. The great philosopher of numbers.",pos:"Analytical, spiritual, wise, intuitive",neg:"Can be distant, cynical, or overly internal",career:"Scientist, Researcher, Philosopher, Mystic",love:"Craves intellectual depth and personal space",advice:"Balance beautiful thinking with warm, open feeling.",el:"Water",pl:"Neptune",color:"Purple & Grey",gem:"Amethyst",day:"Monday",match:"1, 5, 7"},
+    8:{name:"The Achiever", icon:"👑",desc:"Destined for greatness — ambitious, powerful, and built to master the material world. You are a force of nature who gets things done on a magnificent scale.",pos:"Ambitious, efficient, authoritative, goal-driven",neg:"Can be a workaholic, materialistic, or domineering",career:"CEO, Financier, Business Owner, Leader",love:"Attracted to success; needs loyal, solid support",advice:"True wealth includes love, health, and presence.",el:"Earth",pl:"Saturn",color:"Black & Gold",gem:"Diamond",day:"Saturday",match:"2, 4, 8"},
+    9:{name:"The Humanitarian",icon:"🌍",desc:"An old, infinitely wise soul — compassionate, generous, and here to serve and uplift all of humanity with boundless love and timeless wisdom.",pos:"Compassionate, generous, creative, idealistic",neg:"Can be preachy, aloof, or impractical",career:"Healer, Artist, Teacher, Activist",love:"Selfless and romantic — needs true acceptance",advice:"Learn to receive as gracefully as you give.",el:"Fire",pl:"Mars",color:"Gold & Red",gem:"Garnet",day:"Tuesday",match:"3, 6, 9"}
+  },
+  dest:{1:"You are meant to pioneer and lead. Your destiny is to forge new paths and inspire others through your courage and originality.",2:"You are meant to be a diplomat and unifier. Your destiny is to weave harmony, cooperation, and balance into every space you inhabit.",3:"You are meant to be a joyful communicator and creator. Your destiny is to bring beauty, laughter, and inspiration into the world.",4:"You are meant to be a master builder. Your destiny is to create lasting foundations and bring stability where there is chaos.",5:"You are meant to be an agent of positive change. Your destiny is to embrace freedom, celebrate diversity, and guide others to adapt.",6:"You are meant to nurture and heal. Your destiny is to serve your community and loved ones with boundless love and care.",7:"You are meant to seek and share truth. Your destiny is to explore life's mysteries and offer deep wisdom to those around you.",8:"You are meant to achieve and lead powerfully. Your destiny is to master the material world and use that power to uplift others.",9:"You are meant to complete and elevate. Your destiny is to close cycles gracefully and lift all of humanity through wisdom and compassion."},
+  soul:{1:"Deep inside, you crave independence and the freedom to lead on your own terms. Your soul longs to blaze a unique trail no one else has walked.",2:"Your soul yearns for love, harmony, and deep connection. You crave peace and partnerships where you truly feel seen, valued, and understood.",3:"Your soul craves joyful creative expression. You long to make people smile, bring beauty into the world, and feel truly heard and celebrated.",4:"Your soul desires security, stability, and order. You long to build something real and lasting — a foundation that stands through time.",5:"Your soul craves freedom, adventure, and glorious variety. You long to experience everything life has to offer — all its flavours and textures.",6:"Your soul desires to love and be loved deeply. You long to care for others and create a warm, beautiful, harmonious home and family.",7:"Your soul craves wisdom, solitude, and spiritual truth. You long for quiet reflection and the mysteries that lie beneath the surface of things.",8:"Your soul desires power, abundance, and meaningful achievement. You long for recognition and the security that comes with lasting success.",9:"Your soul craves to give, serve, and make the world brighter. You long for universal love and the deep wisdom that comes from experience."},
+  pers:{1:"You project confidence and quiet authority. Others see you as bold, independent, and someone who steps up naturally to lead in any situation.",2:"You project warmth and genuine sensitivity. Others see you as gentle, diplomatic, and a wonderful, attentive listener who truly cares.",3:"You project charm and sparkling creativity. Others see you as fun, expressive, entertaining, and full of magnetic, irresistible life.",4:"You project reliability and calm dependability. Others see you as a stable, trustworthy, hardworking soul who always comes through.",5:"You project excitement and breezy freedom. Others see you as adventurous, social, spontaneous, and wonderfully full of life.",6:"You project nurturing warmth and quiet responsibility. Others see you as caring, protective, and someone you can always count on.",7:"You project quiet mystery and deep wisdom. Others see you as thoughtful, intelligent, and fascinatingly complex beneath the surface.",8:"You project power and purposeful ambition. Others see you as driven, authoritative, successful, and destined for great things.",9:"You project gentle compassion and old-soul wisdom. Others see you as broad-minded, generous, wise beyond your years, and deeply human."}
+};
+
+const DAILY_MSGS = {
+  1:"A day to take bold action and trust your instincts. Leadership energy is sky-high — step forward!",
+  2:"A day for cooperation, patience, and meaningful connections. Listen more than you speak today.",
+  3:"A day bursting with creative energy! Express yourself boldly — art, writing, joyful conversation.",
+  4:"A grounding day — focus on building, organising, and completing practical tasks step by step.",
+  5:"A day of exciting change and unexpected opportunities. Embrace the spontaneous — say yes!",
+  6:"A day for love, family, and healing. Nurture the relationships and spaces that matter most.",
+  7:"A quiet, reflective day. Seek solitude, meditate, journal, and trust your deep inner wisdom.",
+  8:"A powerful day for ambition and achievement. Pursue your biggest goals with full, fearless energy.",
+  9:"A day of completion, compassion, and letting go. Serve others and release what no longer serves you."
+};
+
+const PY_MSGS = {
+  1:"A year of bold new beginnings! Plant seeds, start fresh, trust your instincts, and go first.",
+  2:"A year of patience and partnership. Relationships deepen naturally — listen, collaborate, and connect.",
+  3:"A year for creativity and self-expression. Joy, travel, and beautiful social magic are all around you.",
+  4:"A year to build solid foundations. Hard, disciplined work pays off magnificently — stay the course.",
+  5:"A year of exciting change and freedom. Expect the unexpected — embrace it with open, joyful arms!",
+  6:"A year of love, family, and responsibility. Home, heart, and community all take beautiful centre stage.",
+  7:"A year for deep inner reflection and spiritual growth. Seek wisdom, solitude, and your true north.",
+  8:"A year of powerful ambition and material achievement. Your biggest and boldest moves happen right now.",
+  9:"A year of natural endings and graceful release. Complete old cycles, forgive freely, and prepare to bloom."
+};
+
+const AFFIRMATIONS = {
+  1:"I am a pioneer. I lead with courage and create my own destiny with every bold step I take.",
+  2:"I attract harmony and deep love. My sensitivity is not a weakness — it is my greatest superpower.",
+  3:"I express my truth joyfully and freely. My creativity, laughter, and light illuminate the whole world.",
+  4:"I build with deep purpose and patience. My steady, committed efforts create lasting and beautiful things.",
+  5:"I embrace every change with joy and curiosity. Every new experience makes me richer, freer, and more alive.",
+  6:"I give and receive love freely and abundantly. My nurturing heart heals and uplifts the world around me.",
+  7:"I trust my inner wisdom completely. The universe reveals its deepest, most beautiful secrets to me.",
+  8:"I am a magnet for abundance and meaningful success. My power creates, achieves, and uplifts everyone.",
+  9:"I serve others with love and release the past with grace. I am whole, complete, and deeply at peace."
+};
+
+let libType='lifePath', curNums={}, curName='';
+
+/* ══════════════════════════════════
+   UTILS
+══════════════════════════════════ */
+function reduce(n){while(n>9&&n!==11&&n!==22&&n!==33)n=String(n).split('').reduce((a,b)=>a+parseInt(b),0);return n;}
+function calcLP(d){const[y,m,dy]=d.split('-').map(Number);return reduce([m,dy,y].reduce((a,v)=>a+String(v).split('').reduce((x,c)=>x+parseInt(c),0),0));}
+const LV={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+function lv(c){return LV[c]||0;}
+function calcNN(name,type){const V='AEIOU',L=name.toUpperCase().replace(/[^A-Z]/g,'');return reduce(L.split('').reduce((a,c)=>{if(type==='all')return a+lv(c);if(type==='v'&&V.includes(c))return a+lv(c);if(type==='c'&&!V.includes(c))return a+lv(c);return a;},0));}
+function getDailyNum(){const t=new Date();return reduce(t.getDate()+t.getMonth()+1+t.getFullYear());}
+function getPersonalYear(birth){const[,m,d]=birth.split('-').map(Number);return reduce(m+d+new Date().getFullYear());}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+function goTab(id,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.getElementById(id+'-panel').classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+
+/* ══════════════════════════════════
+   CALCULATE SELF
+══════════════════════════════════ */
+function calcSelf(){
+  const name=document.getElementById('selfName').value.trim();
+  const birth=document.getElementById('selfBirthDate').value;
+  if(!name||!birth){toast('🌸 Fill in your name & birth date!');return;}
+  curName=name;
+  const L=document.getElementById('loading'),B=document.getElementById('loadBar');
+  L.classList.add('on'); B.style.width='0%';
+  document.getElementById('resultCard').style.display='none';
+  setTimeout(()=>B.style.width='100%',50);
+  setTimeout(()=>{
+    const lp=calcLP(birth),dest=calcNN(name,'all'),soul=calcNN(name,'v'),pers=calcNN(name,'c');
+    curNums={lifePath:lp,destiny:dest,soulUrge:soul,personality:pers};
+    const lpd=DB.lp[lp]||{};
+    const dn=['','Pioneer','Diplomat','Creative','Organiser','Changemaker','Nurturer','Truth-Seeker','Powerhouse','Humanitarian'];
+    // cards
+    document.getElementById('n1').textContent=lp;
+    document.getElementById('n1name').textContent=lpd.name||'–';
+    document.getElementById('n1desc').textContent=lpd.desc?lpd.desc.substring(0,52)+'…':'Your life journey';
+    document.getElementById('n2').textContent=dest;
+    document.getElementById('n2name').textContent=dn[dest]||'–';
+    document.getElementById('n2desc').textContent='Your destiny & talents';
+    document.getElementById('n3').textContent=soul;
+    document.getElementById('n3name').textContent='Inner Self';
+    document.getElementById('n3desc').textContent="Heart's deepest desire";
+    document.getElementById('n4').textContent=pers;
+    document.getElementById('n4name').textContent='Outer Self';
+    document.getElementById('n4desc').textContent='How the world sees you';
+    // cosmic profile
+    const elI={Fire:'🔥',Water:'💧',Earth:'🌿',Air:'💨'};
+    const plI={Sun:'☀️',Moon:'🌙',Jupiter:'⚡',Uranus:'🌀',Mercury:'💫',Venus:'💕',Neptune:'🌊',Saturn:'⭐',Mars:'🔴'};
+    document.getElementById('nsEl').textContent=elI[lpd.el]||'✨';
+    document.getElementById('nsElTxt').textContent=lpd.el||'–';
+    document.getElementById('nsPl').textContent=plI[lpd.pl]||'🌟';
+    document.getElementById('nsPlTxt').textContent=lpd.pl||'–';
+    document.getElementById('nsColTxt').textContent=lpd.color||'–';
+    document.getElementById('nsDayTxt').textContent=lpd.day||'–';
+    document.getElementById('nsGemTxt').textContent=lpd.gem||'–';
+    document.getElementById('nsMatTxt').textContent=lpd.match||'–';
+    // personal year
+    const py=getPersonalYear(birth);
+    document.getElementById('pyNum').textContent=py;
+    document.getElementById('pyYearLabel').textContent=new Date().getFullYear();
+    document.getElementById('pyDesc').textContent=PY_MSGS[py]||'A powerful and transformative year ahead!';
+    document.getElementById('pyWidget').style.display='flex';
+    // affirmation
+    document.getElementById('affirmText').textContent=AFFIRMATIONS[lp]||'I am exactly where I need to be in the cosmos.';
+    document.getElementById('affirmCard').style.display='block';
+    // share card
+    document.getElementById('scSubName').textContent=name+"'s Reading";
+    document.getElementById('sc1').textContent=lp;   document.getElementById('sc1n').textContent=lpd.name||'–';
+    document.getElementById('sc2').textContent=dest;  document.getElementById('sc2n').textContent=dn[dest]||'–';
+    document.getElementById('sc3').textContent=soul;  document.getElementById('sc3n').textContent='Inner Self';
+    document.getElementById('sc4').textContent=pers;  document.getElementById('sc4n').textContent='Outer Self';
+    // done
+    L.classList.remove('on');
+    document.getElementById('resultCard').style.display='block';
+    showM('lifePath',lp);
+    toast('🌟 Your cosmic numbers are revealed!');
+  },1700);
+}
+
+/* ══════════════════════════════════
+   MEANING DISPLAY
+══════════════════════════════════ */
+function showM(type,num){
+  if(!num||num==='–')return;
+  let h='';
+  if(type==='lifePath'&&DB.lp[num]){
+    const d=DB.lp[num];
+    h=`<div style="text-align:center;font-size:2rem;margin-bottom:8px;">${d.icon}</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#1A1A1A;margin-bottom:8px;">Life Path ${num}: ${d.name}</div>
+    <div style="margin-bottom:12px;color:#2D2D2D;font-size:.95rem;line-height:1.65;font-weight:700;">${d.desc}</div>
+    <div class="dgrid">
+      <div class="dchip"><div class="dchip-lbl" style="color:#2E7D32;">✅ Strengths</div><div class="dchip-val">${d.pos}</div></div>
+      <div class="dchip"><div class="dchip-lbl" style="color:#C62828;">⚠️ Challenges</div><div class="dchip-val">${d.neg}</div></div>
+      <div class="dchip"><div class="dchip-lbl" style="color:#0D47A1;">💼 Career</div><div class="dchip-val">${d.career}</div></div>
+      <div class="dchip"><div class="dchip-lbl" style="color:#880E4F;">❤️ Love</div><div class="dchip-val">${d.love}</div></div>
+    </div>
+    <div class="dchip" style="margin-top:10px;background:#F1F8E9;">
+      <div class="dchip-lbl" style="color:#2E7D32;">🌿 Cosmic Advice</div>
+      <div class="dchip-val">${d.advice}</div>
+    </div>
+    <div style="margin-top:10px;font-size:.8rem;color:#444;font-weight:800;">🔥 ${d.el} &nbsp;·&nbsp; ${plI(d.pl)} ${d.pl} &nbsp;·&nbsp; 💎 ${d.gem} &nbsp;·&nbsp; 🎨 ${d.color}</div>`;
+  } else {
+    const map={destiny:DB.dest,soulUrge:DB.soul,personality:DB.pers};
+    const labels={destiny:'Destiny',soulUrge:'Soul Urge',personality:'Personality'};
+    const colors={destiny:'#0D47A1',soulUrge:'#4A148C',personality:'#1B5E20'};
+    h=`<div style="font-family:'Fredoka One',cursive;font-size:1.05rem;color:${colors[type]||'#1A1A1A'};margin-bottom:10px;">${labels[type]||''} ${num}</div>
+    <div style="color:#2D2D2D;font-weight:700;line-height:1.75;">${(map[type]||{})[num]||'–'}</div>`;
+  }
+  document.getElementById('qMean').innerHTML=h;
+}
+function plI(pl){const m={Sun:'☀️',Moon:'🌙',Jupiter:'⚡',Uranus:'🌀',Mercury:'💫',Venus:'💕',Neptune:'🌊',Saturn:'⭐',Mars:'🔴'};return m[pl]||'✨';}
+
+function qMeaning(type,btn){
+  showM(type,curNums[type]||1);
+  document.querySelectorAll('#self-panel .mtab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+/* ══════════════════════════════════
+   LIBRARY
+══════════════════════════════════ */
+function setLibT(type,btn){
+  libType=type;
+  document.querySelectorAll('#library-panel .mtab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('libMean').innerHTML='🌸 Pick a number to explore its cosmic meaning!';
+  document.querySelectorAll('.ntile').forEach(t=>t.classList.remove('on'));
+}
+function showLib(num,tile){
+  document.querySelectorAll('.ntile').forEach(t=>t.classList.remove('on'));
+  tile.classList.add('on');
+  const type=libType; let h='';
+  if(type==='lifePath'&&DB.lp[num]){
+    const d=DB.lp[num];
+    h=`<div style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:#1A1A1A;margin-bottom:8px;">${d.icon} ${d.name}</div>
+    <p style="margin-bottom:10px;color:#2D2D2D;font-weight:700;line-height:1.6;">${d.desc}</p>
+    <div style="color:#2E7D32;font-size:.9rem;font-weight:800;margin-bottom:4px;">✅ ${d.pos}</div>
+    <div style="color:#C62828;font-size:.9rem;font-weight:800;margin-bottom:10px;">⚠️ ${d.neg}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div style="background:#FFF;border:2px solid #1A1A1A;border-radius:10px;padding:9px;font-size:.8rem;color:#2D2D2D;font-weight:700;">💼 ${d.career}</div>
+      <div style="background:#FFF;border:2px solid #1A1A1A;border-radius:10px;padding:9px;font-size:.8rem;color:#2D2D2D;font-weight:700;">❤️ ${d.love}</div>
+      <div style="background:#FFF;border:2px solid #1A1A1A;border-radius:10px;padding:9px;font-size:.8rem;color:#2D2D2D;font-weight:700;">💎 ${d.gem}</div>
+      <div style="background:#FFF;border:2px solid #1A1A1A;border-radius:10px;padding:9px;font-size:.8rem;color:#2D2D2D;font-weight:700;">🎨 ${d.color}</div>
+    </div>
+    <div style="font-size:.82rem;color:#444;font-weight:800;">🌿 Advice: ${d.advice}</div>
+    <div style="margin-top:6px;font-size:.8rem;color:#444;font-weight:700;">Planet: ${d.pl} &nbsp;·&nbsp; Lucky Day: ${d.day} &nbsp;·&nbsp; Best Match: ${d.match}</div>`;
+  } else {
+    const map={destiny:DB.dest,soulUrge:DB.soul,personality:DB.pers};
+    const labels={destiny:'Destiny',soulUrge:'Soul Urge',personality:'Personality'};
+    h=`<div style="font-family:'Fredoka One',cursive;color:#1A1A1A;margin-bottom:8px;">${labels[type]||''} ${num}</div>
+    <div style="color:#2D2D2D;font-weight:700;line-height:1.75;">${(map[type]||{})[num]||'–'}</div>`;
+  }
+  document.getElementById('libMean').innerHTML=h;
+}
+
+/* ══════════════════════════════════
+   COMPATIBILITY
+══════════════════════════════════ */
+function calcCompat(){
+  const yn=document.getElementById('pyName').value.trim();
+  const yb=document.getElementById('pyBirth').value;
+  const tn=document.getElementById('ptName').value.trim();
+  const tb=document.getElementById('ptBirth').value;
+  if(!yn||!yb||!tn||!tb){toast('🌸 Fill in all four fields!');return;}
+  const yLP=calcLP(yb),yD=calcNN(yn,'all'),yS=calcNN(yn,'v'),yP=calcNN(yn,'c');
+  const tLP=calcLP(tb),tD=calcNN(tn,'all'),tS=calcNN(tn,'v'),tP=calcNN(tn,'c');
+  ['yLP','yD','yS','yP'].forEach((id,i)=>document.getElementById(id).textContent=[yLP,yD,yS,yP][i]);
+  ['tLP','tD','tS','tP'].forEach((id,i)=>document.getElementById(id).textContent=[tLP,tD,tS,tP][i]);
+  // score: weighted matching + vibrational harmony bonus
+  let score=0;
+  if(yLP===tLP)score+=30; else if(Math.abs(yLP-tLP)===1)score+=15;
+  if(yD===tD)score+=20;   else if(Math.abs(yD-tD)===1)score+=10;
+  if(yS===tS)score+=30;   else if(Math.abs(yS-tS)===1)score+=15;
+  if(yP===tP)score+=20;   else if(Math.abs(yP-tP)===1)score+=10;
+  score=Math.min(100,Math.round(score+Math.random()*8));
+  document.getElementById('compatResult').style.display='block';
+  document.getElementById('cScore').textContent=score+'%';
+  setTimeout(()=>document.getElementById('cBar').style.width=score+'%',80);
+  const msgs=[[88,'💖 Cosmic soulmates — a truly magical, once-in-a-lifetime match!'],[70,'💕 Beautiful harmony — your bond deepens and blooms every single day!'],[50,'💛 Great potential — with love and openness you can create real magic!'],[30,'🌱 Beautifully different — opposites teach and complete each other!'],[0,'🌈 A fascinating challenge — every difference is a doorway to growth!']];
+  document.getElementById('cMsg').textContent=(msgs.find(([min])=>score>=min)||msgs[4])[1];
+  toast('💕 Love match calculated!');
+}
+
+function shareCompat(type){
+  const yn=document.getElementById('pyName').value.trim()||'Person 1';
+  const tn=document.getElementById('ptName').value.trim()||'Person 2';
+  const score=document.getElementById('cScore').textContent;
+  const msg=document.getElementById('cMsg').textContent;
+  const text=`💕 COSMIC LOVE MATCH — Cosmic Numbers\n\n${yn} ❤️ ${tn}\nMatch Score: ${score}\n${msg}\n\n🌟 Find your cosmic match at Cosmic Numbers ✨`;
+  if(type==='whatsapp')window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank');
+  else if(type==='twitter')window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text.slice(0,260))}`,'_blank');
+  else if(type==='facebook')window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}`,'_blank');
+  else{navigator.clipboard.writeText(text);toast('📋 Copied to clipboard!');}
+}
+
+/* ══════════════════════════════════
+   SHARE MODAL
+══════════════════════════════════ */
+function openShareModal(){
+  if(!curNums.lifePath){toast('🌸 Calculate your numbers first!');return;}
+  document.getElementById('shareModal').classList.add('on');
+}
+function closeShareModal(){document.getElementById('shareModal').classList.remove('on');}
+
+function getShareText(){
+  const lpName=DB.lp[curNums.lifePath]?.name||'–';
+  return `🌟 MY COSMIC NUMBERS — Cosmic Numbers\n\n🌟 Life Path ${curNums.lifePath}: ${lpName}\n🎯 Destiny: ${curNums.destiny}\n💭 Soul Urge: ${curNums.soulUrge}\n🎭 Personality: ${curNums.personality}\n\n✨ Discover your cosmic numbers at Cosmic Numbers!`;
+}
+
+async function shareVia(type){
+  const text=getShareText();
+  if(type==='whatsapp'){window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank'); closeShareModal();}
+  else if(type==='twitter'){window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text.slice(0,260))}`,'_blank'); closeShareModal();}
+  else if(type==='facebook'){window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}`,'_blank'); closeShareModal();}
+  else if(type==='instagram'){await navigator.clipboard.writeText(text); toast('📸 Caption copied — paste it in Instagram!'); closeShareModal();}
+  else if(type==='copy'){await navigator.clipboard.writeText(text); toast('📋 Copied to clipboard!'); closeShareModal();}
+  else if(type==='image'){
+    closeShareModal();
+    await new Promise(r=>setTimeout(r,250));
+    const prev=document.getElementById('shareCardPreview');
+    const canvas=await html2canvas(prev,{backgroundColor:'#FFFDE7',scale:2.5});
+    const a=document.createElement('a');
+    a.download='cosmic-numbers.png'; a.href=canvas.toDataURL(); a.click();
+    toast('🖼️ Image saved!');
+  }
+  else if(type==='native'){
+    if(navigator.share){try{await navigator.share({title:'Cosmic Numbers',text});}catch(e){}}
+    else{await navigator.clipboard.writeText(text); toast('📋 Copied!');}
+    closeShareModal();
+  }
+}
+
+function shareAbout(type){
+  const text='🌟 Discover your Cosmic Numbers — a free, beautiful numerology tool revealing your Life Path, Destiny, Soul Urge & more! ✨';
+  if(type==='whatsapp')window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank');
+  else if(type==='twitter')window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,'_blank');
+  else if(type==='facebook')window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}`,'_blank');
+  else{navigator.clipboard.writeText(text); toast('📋 Link copied!');}
+}
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+window.onload=()=>{
+  const dn=getDailyNum();
+  document.getElementById('dailyNum').textContent=dn;
+  document.getElementById('dailyDesc').textContent=DAILY_MSGS[dn]||'A powerful day for growth and reflection.';
+  ['selfName','selfBirthDate','pyName','pyBirth','ptName','ptBirth'].forEach(id=>{
+    const el=document.getElementById(id); if(el)el.value='';
+  });
+};
+
+document.getElementById('shareModal').addEventListener('click',function(e){if(e.target===this)closeShareModal();});
+</script>
+</body>
+</html>
